@@ -1,8 +1,10 @@
 package net.engineeringdigest.journalApp.controller;
 
+import net.engineeringdigest.journalApp.api.response.WeatherResponse;
 import net.engineeringdigest.journalApp.entity.User;
 import net.engineeringdigest.journalApp.repository.UserRepository;
 import net.engineeringdigest.journalApp.service.UserService;
+import net.engineeringdigest.journalApp.service.WeatherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,8 @@ public class UserController {
     private UserService userService;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private WeatherService weatherService;
 
     @GetMapping("/hello")
     public boolean getCall() {
@@ -38,15 +42,29 @@ public class UserController {
         userService.saveNewUser(userInDb);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
     @DeleteMapping("/delete-user")
-    public ResponseEntity<?> deleteByUserName(){
+    public ResponseEntity<?> deleteByUserName() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
         userRepository.deleteByUserName(userName);
-        if(userName == null)
+        if (userName == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         else
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+
+    @GetMapping
+    public ResponseEntity<?> greetings() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        WeatherResponse weatherResponse = weatherService.getWeather("Lahore");
+        String greeting = "";
+        if(weatherResponse!=null){
+            greeting = " Weather feel like " + weatherResponse.getCurrent().getFeelslike();
+        }else{
+            greeting = "No greeting";
+        }
+        return new ResponseEntity<>("Hi " + authentication.getName() + greeting , HttpStatus.OK);
+    }
 }

@@ -2,6 +2,7 @@ package net.engineeringdigest.journalApp.entity;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import lombok.*;
+import net.engineeringdigest.journalApp.enums.Sentiment;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -20,6 +21,7 @@ public class JournalEntry {
     @NonNull
     public String title;
     public LocalDateTime date;
+    private Sentiment sentiment;
     @DBRef
     private List<JournalEntry> journalEntries = new ArrayList<>();
 
