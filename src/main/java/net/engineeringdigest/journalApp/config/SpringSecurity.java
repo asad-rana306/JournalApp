@@ -34,17 +34,26 @@ public class SpringSecurity {
         http
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for simplicity
                 .authorizeHttpRequests(auth -> auth
+                        // ✅ Allow Swagger UI access
+                        .requestMatchers(
+                                "/journal/swagger-ui/**",
+                                "/journal/v3/api-docs/**",
+                                "/journal/swagger-ui.html"
+                        ).permitAll()
+                        // ✅ Secure API Endpoints
                         .requestMatchers("/Journal/**", "/user/**").authenticated()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().permitAll() // Allow all other endpoints without authentication
+                        .anyRequest().permitAll() // Allow all other endpoints
                 )
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 );
+
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
 
     // ✅ Fix: Explicitly define AuthenticationManager bean
     @Bean
